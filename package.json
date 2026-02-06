@@ -1,0 +1,23 @@
+{
+  "name": "hbc-lab-homepage",
+  "version": "1.0.0",
+  "description": "Laboratory for Human Behavior in Crisis Homepage",
+  "main": "index.tsx",
+  "scripts": {
+    "start": "echo 'Open index.html with Live Server'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "lab",
+    "homepage"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lucide-react": "^0.344.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
+  }
+}
