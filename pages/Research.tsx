@@ -124,18 +124,18 @@ export const Research: React.FC = () => {
               // VIEW MODE
               <div className={`relative flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
                  {isAdmin && (
-                    <div className="absolute top-0 right-0 z-50 flex gap-2">
+                    <div className="absolute top-0 right-0 z-50 flex gap-2 bg-white/80 backdrop-blur-sm p-2 rounded-xl shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button 
                         type="button"
                         onClick={(e) => { e.stopPropagation(); startEditing(area); }}
-                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 cursor-pointer shadow-sm border border-blue-200"
+                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 cursor-pointer"
                       >
                         <Pencil size={16} />
                       </button>
                       <button 
                         type="button"
                         onClick={(e) => { e.stopPropagation(); if(window.confirm('Delete area?')) deleteResearchArea(area.id); }}
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 cursor-pointer shadow-sm border border-red-100"
+                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 cursor-pointer"
                       >
                         <Trash2 size={16} />
                       </button>

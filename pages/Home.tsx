@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LAB_NAME } from '../constants';
 import { useLab } from '../context/LabContext';
-import { ArrowRight, Sparkles, Plus, Trash2, ExternalLink, Pencil, Save, X, Image as ImageIcon, Upload } from 'lucide-react';
+import { ArrowRight, Plus, Trash2, ExternalLink, Pencil, Save, X, ImageIcon, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { NewsItem } from '../types';
 
@@ -63,7 +63,6 @@ export const Home: React.FC = () => {
 
   const startEditing = (item: NewsItem) => {
     setEditingId(item.id);
-    // Convert YYYY.MM.DD (display) -> YYYY-MM-DD (input)
     setEditForm({ 
       ...item,
       date: item.date.replace(/\./g, '-')
@@ -74,7 +73,6 @@ export const Home: React.FC = () => {
     if (editingId && editForm.title && editForm.date) {
       updateNews(editingId, {
         ...editForm,
-        // Convert YYYY-MM-DD (input) -> YYYY.MM.DD (display)
         date: editForm.date.replace(/-/g, '.')
       });
       setEditingId(null);
@@ -82,70 +80,59 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="space-y-16 animate-in fade-in duration-500">
+    <div className="space-y-20 animate-in fade-in duration-700">
       {/* Hero Section */}
-      <section className="space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-xs font-medium uppercase tracking-wider">
-          <Sparkles size={12} className="text-blue-600" />
-          Laboratory for Human Behavior in Crisis
-        </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-zinc-900 leading-[1.1]">
-          Understanding <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">human behavior</span> in times of crisis.
+      <section className="space-y-8 pt-4">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 leading-[1.2]">
+          Understanding <span className="text-zinc-400">human behavior</span><br /> 
+          in times of crisis.
         </h1>
-        <p className="text-lg md:text-xl text-zinc-500 max-w-2xl leading-relaxed">
-          Welcome to {LAB_NAME} at Chungbuk National University. We research trauma, crisis intervention, and resilience to help individuals and society recover and grow.
+        <p className="text-lg text-zinc-600 max-w-2xl leading-relaxed font-light">
+          Welcome to {LAB_NAME}. We investigate trauma, resilience, and decision-making 
+          processes to develop effective psychological interventions for individuals and communities.
         </p>
-        <div className="flex flex-wrap gap-4 pt-4">
+        <div className="flex flex-wrap gap-4 pt-2">
           <Link 
             to="/research" 
-            className="inline-flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-xl font-medium hover:bg-zinc-800 transition-all hover:scale-[1.02] active:scale-95"
+            className="inline-flex items-center gap-2 text-zinc-900 border-b border-zinc-900 pb-0.5 hover:text-zinc-600 hover:border-zinc-600 transition-colors font-medium"
           >
-            Our Research <ArrowRight size={18} />
+            Research Areas <ArrowRight size={16} />
           </Link>
           <a 
             href="https://psychology.chungbuk.ac.kr/" 
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 bg-white border border-zinc-200 text-zinc-700 px-6 py-3 rounded-xl font-medium hover:bg-zinc-50 transition-all hover:border-zinc-300"
+            className="inline-flex items-center gap-2 text-zinc-400 border-b border-zinc-200 pb-0.5 hover:text-zinc-900 hover:border-zinc-900 transition-colors font-medium ml-4"
           >
-            Dept. Website <ExternalLink size={16} />
+            Dept. Website <ExternalLink size={14} />
           </a>
         </div>
       </section>
 
       {/* Image Banner */}
-      <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden shadow-sm group">
+      <div className="relative w-full aspect-[21/9] md:h-[400px] bg-zinc-100 overflow-hidden group">
         {isEditingImage ? (
-          <div className="absolute inset-0 bg-zinc-50 z-20 flex flex-col items-center justify-center p-6 gap-4">
+          <div className="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center p-6 gap-4">
              <h3 className="font-bold text-lg text-zinc-900">Update Banner Image</h3>
              
              <div className="w-full max-w-md space-y-3">
                <div className="flex gap-2">
                  <input 
-                    className="flex-1 p-3 border rounded-xl shadow-sm"
+                    className="flex-1 p-3 border border-zinc-200 rounded-lg text-sm"
                     placeholder="Enter Image URL..."
                     value={tempImageUrl}
                     onChange={(e) => setTempImageUrl(e.target.value)}
                     autoFocus
                  />
-                 <button onClick={saveImage} type="button" className="bg-blue-600 text-white px-4 rounded-xl hover:bg-blue-700">Save</button>
-                 <button onClick={() => setIsEditingImage(false)} type="button" className="bg-white border text-zinc-700 px-4 rounded-xl hover:bg-zinc-50">Cancel</button>
+                 <button onClick={saveImage} type="button" className="bg-zinc-900 text-white px-4 rounded-lg text-sm hover:bg-zinc-800">Save</button>
+                 <button onClick={() => setIsEditingImage(false)} type="button" className="bg-white border text-zinc-700 px-4 rounded-lg text-sm hover:bg-zinc-50">Cancel</button>
                </div>
                
-               <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-zinc-300" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-zinc-50 px-2 text-zinc-500">Or upload file</span>
-                  </div>
-               </div>
-
                <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-zinc-300 border-dashed rounded-xl cursor-pointer bg-zinc-50 hover:bg-zinc-100 transition-colors">
+                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-zinc-200 border-dashed rounded-lg cursor-pointer bg-zinc-50 hover:bg-zinc-100 transition-colors">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Upload className="w-8 h-8 text-zinc-400 mb-2" />
-                          <p className="text-sm text-zinc-500">Click to upload image</p>
+                          <Upload className="w-6 h-6 text-zinc-400 mb-2" />
+                          <p className="text-xs text-zinc-500">Upload image</p>
                       </div>
                       <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
                   </label>
@@ -157,136 +144,117 @@ export const Home: React.FC = () => {
             <img 
               src={homeImage} 
               alt="Lab environment" 
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover grayscale opacity-90 hover:opacity-100 hover:grayscale-0 transition-all duration-1000 ease-in-out"
             />
             {isAdmin && (
               <button 
                 type="button"
                 onClick={startEditingImage}
-                className="absolute top-4 right-4 z-50 bg-white text-zinc-800 px-4 py-2 rounded-lg text-sm font-medium shadow-md border border-zinc-200 flex items-center gap-2 hover:bg-zinc-50 cursor-pointer"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur text-zinc-800 px-3 py-1.5 rounded text-xs font-medium shadow-sm hover:bg-white flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <ImageIcon size={16} /> Edit Image
+                <ImageIcon size={14} /> Edit Image
               </button>
             )}
           </>
         )}
       </div>
 
-      {/* News Section */}
-      <section>
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-zinc-900">Lab News</h2>
+      {/* News Section - Clean List Style */}
+      <section className="max-w-3xl">
+        <div className="flex items-center justify-between mb-8 border-b border-zinc-100 pb-4">
+          <h2 className="text-lg font-bold text-zinc-900">Lab News</h2>
           {isAdmin && !isAdding && (
             <button 
               type="button"
               onClick={() => setIsAdding(true)}
-              className="flex items-center gap-2 text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 text-xs bg-zinc-900 text-white px-3 py-1.5 rounded hover:bg-zinc-700 transition-colors"
             >
-              <Plus size={16} /> Add News
+              <Plus size={14} /> Add News
             </button>
           )}
-          {!isAdmin && <span className="text-sm text-zinc-400">Updates & Announcements</span>}
         </div>
 
         {isAdding && (
-          <form onSubmit={handleAddNews} className="mb-8 p-6 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-4">
-            <h3 className="font-bold text-lg">Add New Post</h3>
+          <form onSubmit={handleAddNews} className="mb-10 p-6 bg-zinc-50 border border-zinc-100 rounded-lg space-y-4">
+            <h3 className="font-bold text-sm">New Announcement</h3>
             <div className="flex gap-4">
               <input
                 type="date"
                 required
-                className="p-3 border rounded-xl"
+                className="p-2 border rounded text-sm"
                 value={newPost.date}
                 onChange={e => setNewPost({...newPost, date: e.target.value})}
               />
               <input
                 required
                 placeholder="Title"
-                className="flex-1 p-3 border rounded-xl"
+                className="flex-1 p-2 border rounded text-sm"
                 value={newPost.title}
                 onChange={e => setNewPost({...newPost, title: e.target.value})}
               />
             </div>
             <textarea
               required
-              placeholder="Content"
-              className="w-full p-3 border rounded-xl h-24"
+              placeholder="Content details..."
+              className="w-full p-2 border rounded h-20 text-sm"
               value={newPost.content}
               onChange={e => setNewPost({...newPost, content: e.target.value})}
             />
-            <div className="flex gap-3">
-              <button type="submit" className="bg-zinc-900 text-white px-4 py-2 rounded-lg">Save</button>
-              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-4 py-2 rounded-lg">Cancel</button>
+            <div className="flex gap-2">
+              <button type="submit" className="bg-zinc-900 text-white px-3 py-1.5 rounded text-sm">Post</button>
+              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-3 py-1.5 rounded text-sm">Cancel</button>
             </div>
           </form>
         )}
         
-        <div className="grid gap-6">
+        <div className="space-y-6">
           {news.map((item) => (
-            <div key={item.id} className="group relative">
+            <div key={item.id} className="group">
                {editingId === item.id ? (
                  // Edit Mode
-                 <div className="p-6 rounded-2xl bg-zinc-50 border-2 border-blue-500 space-y-4">
+                 <div className="p-4 rounded-lg bg-zinc-50 border border-zinc-200 space-y-3">
                     <div className="flex justify-between items-center">
-                      <h4 className="font-bold text-blue-600">Editing Post</h4>
-                      <button type="button" onClick={() => setEditingId(null)} className="text-zinc-400 hover:text-zinc-600"><X size={20}/></button>
+                      <h4 className="font-bold text-xs text-zinc-500 uppercase">Editing</h4>
+                      <button type="button" onClick={() => setEditingId(null)} className="text-zinc-400 hover:text-zinc-600"><X size={16}/></button>
                     </div>
-                    <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input 
                         type="date"
-                        className="p-3 border rounded-xl"
+                        className="p-2 border rounded text-sm"
                         value={editForm.date || ''}
                         onChange={e => setEditForm({...editForm, date: e.target.value})}
                       />
                       <input 
-                        className="flex-1 p-3 border rounded-xl" 
+                        className="flex-1 p-2 border rounded text-sm" 
                         value={editForm.title || ''} 
                         onChange={e => setEditForm({...editForm, title: e.target.value})} 
                       />
                     </div>
                     <textarea 
-                      className="w-full p-3 border rounded-xl h-24" 
+                      className="w-full p-2 border rounded h-20 text-sm" 
                       value={editForm.content || ''} 
                       onChange={e => setEditForm({...editForm, content: e.target.value})} 
                     />
-                    <button type="button" onClick={saveEditing} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700">
-                      <Save size={16} /> Save Changes
+                    <button type="button" onClick={saveEditing} className="bg-zinc-900 text-white px-3 py-1.5 rounded text-xs flex items-center gap-2 hover:bg-zinc-700">
+                      <Save size={14} /> Save
                     </button>
                  </div>
                ) : (
-                 // View Mode - Buttons are always visible for admin
-                  <div className="relative flex flex-col md:flex-row gap-4 md:gap-8 p-6 rounded-2xl bg-zinc-50 border border-zinc-100 hover:border-zinc-200 transition-colors">
+                 // View Mode - Minimalist List
+                  <div className="relative pl-4 border-l-2 border-transparent hover:border-zinc-200 transition-colors py-1">
                     {isAdmin && (
-                      <div className="absolute top-4 right-4 z-50 flex gap-2">
-                        <button 
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); startEditing(item); }}
-                          className="p-2 bg-white text-blue-600 rounded-lg shadow-sm border border-zinc-200 hover:bg-blue-50 cursor-pointer"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); if(window.confirm('Delete this post?')) deleteNews(item.id); }}
-                          className="p-2 bg-white text-red-500 rounded-lg shadow-sm border border-zinc-200 hover:bg-red-50 cursor-pointer"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                      <div className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity">
+                         <button onClick={() => startEditing(item)} className="text-zinc-400 hover:text-blue-600"><Pencil size={14}/></button>
+                         <button onClick={() => { if(window.confirm('Delete?')) deleteNews(item.id); }} className="text-zinc-400 hover:text-red-500"><Trash2 size={14}/></button>
                       </div>
                     )}
-                    <div className="md:w-32 flex-shrink-0">
-                      <span className="inline-block px-3 py-1 bg-white rounded-md text-xs font-semibold text-zinc-500 shadow-sm border border-zinc-100">
-                        {item.date}
-                      </span>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 items-baseline mb-1">
+                      <span className="text-xs font-mono text-zinc-400 whitespace-nowrap">{item.date}</span>
+                      <h3 className="text-base font-semibold text-zinc-900">{item.title}</h3>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-zinc-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {item.title}
-                      </h3>
-                      <p className="text-zinc-600 leading-relaxed">
-                        {item.content}
-                      </p>
-                    </div>
+                    <p className="text-sm text-zinc-500 leading-relaxed sm:pl-[6.5rem]">
+                      {item.content}
+                    </p>
                   </div>
                )}
             </div>

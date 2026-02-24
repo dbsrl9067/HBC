@@ -1,32 +1,20 @@
-# HBC Lab (Laboratory for Human Behavior in Crisis)
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-Homepage for the Laboratory for Human Behavior in Crisis at Chungbuk National University.
+# Run and deploy your AI Studio app
 
-## Features
+This contains everything you need to run your app locally.
 
-- **Lab News**: Latest updates and announcements.
-- **Members**: Introduction of PI, students, and alumni.
-- **Research**: Details on research areas and projects.
-- **Publications**: List of academic papers and conference proceedings.
-- **Admin Mode**: Client-side admin interface to manage content (add/edit/delete).
+View your app in AI Studio: https://ai.studio/apps/drive/18R_vRIjZPM3rTKFqO2_oeJCg_kU_083o
 
-## Tech Stack
+## Run Locally
 
-- React 18
-- React Router 6
-- Tailwind CSS
-- Lucide React (Icons)
-- Context API (State Management)
+**Prerequisites:**  Node.js
 
-## Getting Started
 
-This project currently uses ES Modules via `importmap` for a no-build setup suitable for rapid prototyping.
-
-### Local Development
-
-1. Clone the repository.
-2. Open `index.html` in a browser or serve using a simple static server (e.g., Live Server).
-
-## License
-
-All rights reserved.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

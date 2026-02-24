@@ -1,4 +1,18 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { 
+  collection, 
+  onSnapshot, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  writeBatch, 
+  setDoc,
+  query,
+  orderBy,
+  getDocs
+} from 'firebase/firestore';
 import { NEWS, MEMBERS, PUBLICATIONS, RESEARCH_AREAS } from '../constants';
 import { Member, NewsItem, Publication, ResearchArea } from '../types';
 
@@ -6,7 +20,6 @@ interface LabContextType {
   isAdmin: boolean;
   login: (password: string) => boolean;
   logout: () => void;
-  changePassword: (newPass: string) => void;
   
   homeImage: string;
   updateHomeImage: (url: string) => void;
@@ -37,17 +50,61 @@ interface LabContextType {
 const LabContext = createContext<LabContextType | undefined>(undefined);
 
 export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // --- Auth State ---
+  // Auth state stays local for this simple app
   const [isAdmin, setIsAdmin] = useState(() => {
     return localStorage.getItem('lab_is_admin') === 'true';
   });
 
-  const [adminPassword, setAdminPassword] = useState(() => {
-    return localStorage.getItem('lab_admin_password') || 'admin';
-  });
+  const [homeImage, setHomeImage] = useState<string>('https://picsum.photos/1200/600?grayscale');
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [publications, setPublications] = useState<Publication[]>([]);
+  const [researchAreas, setResearchAreas] = useState<ResearchArea[]>([]);
+
+  // Subscribe to Firebase Data
+  useEffect(() => {
+    // Settings (Home Image)
+    const unsubSettings = onSnapshot(doc(db, "settings", "general"), (doc) => {
+      if (doc.exists()) {
+        setHomeImage(doc.data().homeImage);
+      }
+    });
+
+    // News (Ordered by date)
+    const qNews = query(collection(db, "news"), orderBy("date", "desc"));
+    const unsubNews = onSnapshot(qNews, (snapshot) => {
+      setNews(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NewsItem)));
+    });
+
+    // Members
+    // Note: Firestore doesn't guarantee order without a sort field. 
+    // For now we rely on client-side filtering/rendering order in the component.
+    const unsubMembers = onSnapshot(collection(db, "members"), (snapshot) => {
+      setMembers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Member)));
+    });
+
+    // Publications (Ordered by year)
+    const qPubs = query(collection(db, "publications"), orderBy("year", "desc"));
+    const unsubPubs = onSnapshot(qPubs, (snapshot) => {
+      setPublications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Publication)));
+    });
+
+    // Research Areas
+    const unsubResearch = onSnapshot(collection(db, "research_areas"), (snapshot) => {
+      setResearchAreas(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ResearchArea)));
+    });
+
+    return () => {
+      unsubSettings();
+      unsubNews();
+      unsubMembers();
+      unsubPubs();
+      unsubResearch();
+    };
+  }, []);
 
   const login = (password: string) => {
-    if (password === adminPassword) {
+    if (password === 'admin') {
       setIsAdmin(true);
       localStorage.setItem('lab_is_admin', 'true');
       return true;
@@ -60,92 +117,110 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem('lab_is_admin');
   };
 
-  const changePassword = (newPass: string) => {
-    setAdminPassword(newPass);
-    localStorage.setItem('lab_admin_password', newPass);
+  // --- Firestore Actions ---
+
+  const updateHomeImage = async (url: string) => {
+    await setDoc(doc(db, "settings", "general"), { homeImage: url }, { merge: true });
   };
-  
-  // --- Data States ---
-  const [homeImage, setHomeImage] = useState<string>(() => {
-    return localStorage.getItem('lab_home_image') || 'https://picsum.photos/1200/600?grayscale';
-  });
-  
-  const [news, setNews] = useState<NewsItem[]>(() => {
-    const saved = localStorage.getItem('lab_news');
-    return saved ? JSON.parse(saved) : NEWS;
-  });
 
-  const [members, setMembers] = useState<Member[]>(() => {
-    const saved = localStorage.getItem('lab_members');
-    return saved ? JSON.parse(saved) : MEMBERS;
-  });
+  const addNews = async (item: NewsItem) => {
+    const { id, ...data } = item; // Let Firestore generate ID
+    await addDoc(collection(db, "news"), data);
+  };
+  const updateNews = async (id: string, item: Partial<NewsItem>) => {
+    await updateDoc(doc(db, "news", id), item);
+  };
+  const deleteNews = async (id: string) => {
+    await deleteDoc(doc(db, "news", id));
+  };
 
-  const [publications, setPublications] = useState<Publication[]>(() => {
-    const saved = localStorage.getItem('lab_publications');
-    return saved ? JSON.parse(saved) : PUBLICATIONS;
-  });
+  const addMember = async (member: Member) => {
+    const { id, ...data } = member;
+    await addDoc(collection(db, "members"), data);
+  };
+  const updateMember = async (id: string, member: Partial<Member>) => {
+    await updateDoc(doc(db, "members", id), member);
+  };
+  const deleteMember = async (id: string) => {
+    await deleteDoc(doc(db, "members", id));
+  };
 
-  const [researchAreas, setResearchAreas] = useState<ResearchArea[]>(() => {
-    const saved = localStorage.getItem('lab_research');
-    return saved ? JSON.parse(saved) : RESEARCH_AREAS;
-  });
+  const addPublication = async (pub: Publication) => {
+    const { id, ...data } = pub;
+    await addDoc(collection(db, "publications"), data);
+  };
+  const updatePublication = async (id: string, pub: Partial<Publication>) => {
+    await updateDoc(doc(db, "publications", id), pub);
+  };
+  const deletePublication = async (id: string) => {
+    await deleteDoc(doc(db, "publications", id));
+  };
 
-  // --- Persistence Effects ---
-  useEffect(() => localStorage.setItem('lab_home_image', homeImage), [homeImage]);
-  useEffect(() => localStorage.setItem('lab_news', JSON.stringify(news)), [news]);
-  useEffect(() => localStorage.setItem('lab_members', JSON.stringify(members)), [members]);
-  useEffect(() => localStorage.setItem('lab_publications', JSON.stringify(publications)), [publications]);
-  useEffect(() => localStorage.setItem('lab_research', JSON.stringify(researchAreas)), [researchAreas]);
+  const addResearchArea = async (area: ResearchArea) => {
+    const { id, ...data } = area;
+    await addDoc(collection(db, "research_areas"), data);
+  };
+  const updateResearchArea = async (id: string, area: Partial<ResearchArea>) => {
+    await updateDoc(doc(db, "research_areas", id), area);
+  };
+  const deleteResearchArea = async (id: string) => {
+    await deleteDoc(doc(db, "research_areas", id));
+  };
 
-  // --- Actions ---
-  const updateHomeImage = (url: string) => setHomeImage(url);
+  const resetData = async () => {
+    if (!window.confirm("WARNING: This will delete ALL data in the database and reset it to default constants. Are you sure?")) return;
+    
+    try {
+      // Helper to clear collection
+      const clearCollection = async (name: string) => {
+        const snapshot = await getDocs(collection(db, name));
+        if (snapshot.empty) return; // Skip if empty to avoid empty batch commit
+        
+        const batch = writeBatch(db);
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+      }
 
-  const resetData = () => {
-    if (window.confirm("Are you sure? This will revert all data to the initial default state.")) {
-      setHomeImage('https://picsum.photos/1200/600?grayscale');
-      setNews(NEWS);
-      setMembers(MEMBERS);
-      setPublications(PUBLICATIONS);
-      setResearchAreas(RESEARCH_AREAS);
+      // 1. Clear all collections
+      await Promise.all([
+        clearCollection('news'),
+        clearCollection('members'),
+        clearCollection('publications'),
+        clearCollection('research_areas')
+      ]);
+
+      // 2. Batch add defaults
+      // Note: WriteBatch has a limit of 500 ops. Our constants are small so it's fine.
+      const batch = writeBatch(db);
+
+      NEWS.forEach(({id, ...item}) => batch.set(doc(collection(db, 'news')), item));
+      MEMBERS.forEach(({id, ...item}) => batch.set(doc(collection(db, 'members')), item));
+      PUBLICATIONS.forEach(({id, ...item}) => batch.set(doc(collection(db, 'publications')), item));
+      RESEARCH_AREAS.forEach(({id, ...item}) => batch.set(doc(collection(db, 'research_areas')), item));
+      
+      // Reset Home Image
+      batch.set(doc(db, "settings", "general"), { homeImage: 'https://picsum.photos/1200/600?grayscale' });
+
+      await batch.commit();
+      alert("Database has been reset to defaults!");
+      
+    } catch (error) {
+      console.error("Error resetting data:", error);
+      alert("Failed to reset data. Check console for details.");
     }
   };
 
-  // Functional updates for reliability
-  const addNews = (item: NewsItem) => setNews(prev => [item, ...prev]);
-  const updateNews = (id: string, item: Partial<NewsItem>) => {
-    setNews(prev => prev.map(n => n.id === id ? { ...n, ...item } : n));
-  };
-  const deleteNews = (id: string) => setNews(prev => prev.filter(n => n.id !== id));
-
-  const addMember = (member: Member) => setMembers(prev => [...prev, member]);
-  const updateMember = (id: string, member: Partial<Member>) => {
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, ...member } : m));
-  };
-  const deleteMember = (id: string) => setMembers(prev => prev.filter(m => m.id !== id));
-
-  const addPublication = (pub: Publication) => setPublications(prev => [pub, ...prev]);
-  const updatePublication = (id: string, pub: Partial<Publication>) => {
-    setPublications(prev => prev.map(p => p.id === id ? { ...p, ...pub } : p));
-  };
-  const deletePublication = (id: string) => setPublications(prev => prev.filter(p => p.id !== id));
-
-  const addResearchArea = (area: ResearchArea) => setResearchAreas(prev => [...prev, area]);
-  const updateResearchArea = (id: string, area: Partial<ResearchArea>) => {
-    setResearchAreas(prev => prev.map(r => r.id === id ? { ...r, ...area } : r));
-  };
-  const deleteResearchArea = (id: string) => setResearchAreas(prev => prev.filter(r => r.id !== id));
-
-  const value = useMemo(() => ({
-    isAdmin, login, logout, changePassword, resetData,
-    homeImage, updateHomeImage,
-    news, addNews, updateNews, deleteNews,
-    members, addMember, updateMember, deleteMember,
-    publications, addPublication, updatePublication, deletePublication,
-    researchAreas, addResearchArea, updateResearchArea, deleteResearchArea
-  }), [isAdmin, homeImage, news, members, publications, researchAreas]);
-
   return (
-    <LabContext.Provider value={value}>
+    <LabContext.Provider value={{
+      isAdmin, login, logout, resetData,
+      homeImage, updateHomeImage,
+      news, addNews, updateNews, deleteNews,
+      members, addMember, updateMember, deleteMember,
+      publications, addPublication, updatePublication, deletePublication,
+      researchAreas, addResearchArea, updateResearchArea, deleteResearchArea
+    }}>
       {children}
     </LabContext.Provider>
   );

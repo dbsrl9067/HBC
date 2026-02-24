@@ -15,7 +15,7 @@ export const Publications: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Publication> & { authorsStr?: string }>({});
 
-  const years = Array.from(new Set(publications.map(p => p.year))).sort((a: number, b: number) => b - a);
+  const years = Array.from(new Set(publications.map(p => p.year))).sort((a, b) => b - a);
   const filteredPublications = filterYear === 'All' 
     ? publications 
     : publications.filter(p => p.year === filterYear);
@@ -147,18 +147,18 @@ export const Publications: React.FC = () => {
               // VIEW MODE
               <div className="relative p-6 rounded-2xl bg-white border border-zinc-100 hover:border-blue-200 hover:shadow-md transition-all duration-200">
                  {isAdmin && (
-                    <div className="absolute top-4 right-4 z-50 flex gap-2">
+                    <div className="absolute top-4 right-4 z-50 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button 
                         type="button"
                         onClick={(e) => { e.stopPropagation(); startEditing(pub); }}
-                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 cursor-pointer shadow-sm border border-blue-200"
+                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 cursor-pointer"
                       >
                         <Pencil size={16} />
                       </button>
                       <button 
                         type="button"
                         onClick={(e) => { e.stopPropagation(); if(window.confirm('Delete publication?')) deletePublication(pub.id); }}
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 cursor-pointer shadow-sm border border-red-100"
+                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 cursor-pointer"
                       >
                         <Trash2 size={16} />
                       </button>
