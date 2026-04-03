@@ -1,7 +1,9 @@
 import { Member, Publication, NewsItem, ResearchArea } from './types';
 
 export const LAB_NAME = "HBC Lab";
+export const LAB_NAME_KO = "HBC Lab";
 export const UNIVERSITY_NAME = "Chungbuk National University, Dept. of Psychology";
+export const UNIVERSITY_NAME_KO = "충북대학교 심리학과";
 
 export const NEWS: NewsItem[] = [
   {

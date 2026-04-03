@@ -1,7 +1,7 @@
 export interface Member {
   id: string;
   name: string;
-  role: 'Principal Investigator' | 'PhD Student' | 'Master Student' | 'Alumni';
+  role: 'Principal Investigator' | 'PhD Student' | 'Master Student' | 'Undergraduate Research Assistant' | 'Alumni';
   email?: string;
   imageUrl: string;
   researchInterests?: string[];
