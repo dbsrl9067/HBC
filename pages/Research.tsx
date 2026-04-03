@@ -57,37 +57,39 @@ export const Research: React.FC = () => {
     <div className="space-y-12 animate-in fade-in duration-500">
       <div className="flex justify-between items-end">
         <div className="max-w-3xl space-y-4">
-          <h1 className="text-4xl font-bold text-zinc-900">Research</h1>
+          <h1 className="text-4xl font-bold text-zinc-900 tracking-tight">RESEARCH</h1>
           <p className="text-lg text-zinc-500">
-            Our work spans multiple disciplines, aiming to solve fundamental problems in artificial intelligence.
+            Our work spans multiple disciplines, aiming to investigate human behavior in crisis and develop psychological interventions.
+            <br />
+            <span className="text-sm text-zinc-400">저희 연구실은 위기 상황에서의 인간 행동을 연구하고 심리적 개입 방안을 개발하기 위해 다양한 학제간 연구를 수행합니다.</span>
           </p>
         </div>
         {isAdmin && !isAdding && (
           <button type="button" onClick={() => setIsAdding(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl">
-            <Plus size={18} /> Add Area
+            <Plus size={18} /> 분야 추가
           </button>
         )}
       </div>
 
       {isAdding && (
          <form onSubmit={handleAdd} className="p-6 bg-zinc-50 border rounded-2xl space-y-4">
-            <input required placeholder="Title" className="w-full p-3 border rounded-xl" value={newArea.title} onChange={e => setNewArea({...newArea, title: e.target.value})} />
-            <textarea required placeholder="Description" className="w-full p-3 border rounded-xl" value={newArea.description} onChange={e => setNewArea({...newArea, description: e.target.value})} />
+            <input required placeholder="분야 제목" className="w-full p-3 border rounded-xl" value={newArea.title} onChange={e => setNewArea({...newArea, title: e.target.value})} />
+            <textarea required placeholder="설명" className="w-full p-3 border rounded-xl" value={newArea.description} onChange={e => setNewArea({...newArea, description: e.target.value})} />
             
             <div className="grid md:grid-cols-2 gap-4">
                <div className="flex gap-2">
-                 <input placeholder="Image URL (https://...)" className="flex-1 p-3 border rounded-xl" value={newArea.imageUrl || ''} onChange={e => setNewArea({...newArea, imageUrl: e.target.value})} />
+                 <input placeholder="이미지 URL (https://...)" className="flex-1 p-3 border rounded-xl" value={newArea.imageUrl || ''} onChange={e => setNewArea({...newArea, imageUrl: e.target.value})} />
                  <label className="flex items-center justify-center px-4 bg-zinc-100 border border-zinc-200 rounded-xl cursor-pointer hover:bg-zinc-200">
                     <Upload size={20} className="text-zinc-500" />
                     <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, false)} />
                  </label>
                </div>
-               <input placeholder="Project Link (Optional)" className="w-full p-3 border rounded-xl" value={newArea.link} onChange={e => setNewArea({...newArea, link: e.target.value})} />
+               <input placeholder="프로젝트 링크 (선택 사항)" className="w-full p-3 border rounded-xl" value={newArea.link} onChange={e => setNewArea({...newArea, link: e.target.value})} />
             </div>
 
             <div className="flex gap-3">
-              <button type="submit" className="bg-zinc-900 text-white px-4 py-2 rounded-lg">Save</button>
-              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-4 py-2 rounded-lg">Cancel</button>
+              <button type="submit" className="bg-zinc-900 text-white px-4 py-2 rounded-lg">저장</button>
+              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-4 py-2 rounded-lg">취소</button>
             </div>
          </form>
       )}

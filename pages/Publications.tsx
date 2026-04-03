@@ -60,16 +60,18 @@ export const Publications: React.FC = () => {
     <div className="space-y-10 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-100 pb-8">
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-zinc-900">Publications</h1>
+          <h1 className="text-4xl font-bold text-zinc-900 tracking-tight">PUBLICATIONS</h1>
           <p className="text-lg text-zinc-500">
             Selected papers from top-tier conferences and journals.
+            <br />
+            <span className="text-sm text-zinc-400">주요 학술지 및 컨퍼런스 발표 논문 목록입니다.</span>
           </p>
         </div>
         
         <div className="flex items-center gap-4">
           {isAdmin && !isAdding && (
             <button type="button" onClick={() => setIsAdding(true)} className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap">
-              <Plus size={16} /> Add
+              <Plus size={16} /> 실적 추가
             </button>
           )}
           {/* Year Filter */}
@@ -82,7 +84,7 @@ export const Publications: React.FC = () => {
                   : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
               }`}
             >
-              All Years
+              All Years <span className="text-[10px] font-normal opacity-50 ml-1">전체</span>
             </button>
             {years.map(year => (
               <button
@@ -103,17 +105,17 @@ export const Publications: React.FC = () => {
 
       {isAdding && (
         <form onSubmit={handleAdd} className="p-6 bg-zinc-50 border rounded-2xl space-y-4">
-           <h3 className="font-bold text-lg">Add New Publication</h3>
+           <h3 className="font-bold text-lg">새 연구 실적 추가</h3>
            <div className="grid md:grid-cols-2 gap-4">
-             <input required placeholder="Title" className="col-span-2 p-3 border rounded-xl" value={newPub.title} onChange={e => setNewPub({...newPub, title: e.target.value})} />
-             <input required placeholder="Venue (e.g. CVPR)" className="p-3 border rounded-xl" value={newPub.venue} onChange={e => setNewPub({...newPub, venue: e.target.value})} />
-             <input required type="number" placeholder="Year" className="p-3 border rounded-xl" value={newPub.year} onChange={e => setNewPub({...newPub, year: Number(e.target.value)})} />
-             <input required placeholder="Authors (comma separated)" className="col-span-2 p-3 border rounded-xl" value={newPub.authors} onChange={e => setNewPub({...newPub, authors: e.target.value})} />
-             <input placeholder="DOI Link (e.g., https://doi.org/...)" className="col-span-2 p-3 border rounded-xl" value={newPub.doi} onChange={e => setNewPub({...newPub, doi: e.target.value})} />
+             <input required placeholder="논문 제목" className="col-span-2 p-3 border rounded-xl" value={newPub.title} onChange={e => setNewPub({...newPub, title: e.target.value})} />
+             <input required placeholder="게재지 (예: CVPR)" className="p-3 border rounded-xl" value={newPub.venue} onChange={e => setNewPub({...newPub, venue: e.target.value})} />
+             <input required type="number" placeholder="연도" className="p-3 border rounded-xl" value={newPub.year} onChange={e => setNewPub({...newPub, year: Number(e.target.value)})} />
+             <input required placeholder="저자 (쉼표로 구분)" className="col-span-2 p-3 border rounded-xl" value={newPub.authors} onChange={e => setNewPub({...newPub, authors: e.target.value})} />
+             <input placeholder="DOI 링크 (예: https://doi.org/...)" className="col-span-2 p-3 border rounded-xl" value={newPub.doi} onChange={e => setNewPub({...newPub, doi: e.target.value})} />
            </div>
            <div className="flex gap-3">
-              <button type="submit" className="bg-zinc-900 text-white px-4 py-2 rounded-lg">Save</button>
-              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-4 py-2 rounded-lg">Cancel</button>
+              <button type="submit" className="bg-zinc-900 text-white px-4 py-2 rounded-lg">저장</button>
+              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-4 py-2 rounded-lg">취소</button>
             </div>
         </form>
       )}
@@ -211,7 +213,7 @@ export const Publications: React.FC = () => {
         
         {filteredPublications.length === 0 && (
             <div className="text-center py-20 text-zinc-400">
-                No publications found for this year.
+                해당 연도의 연구 실적이 없습니다.
             </div>
         )}
       </div>

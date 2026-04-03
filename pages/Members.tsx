@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLab } from '../context/LabContext';
+import { LAB_NAME_KO, LAB_NAME } from '../constants';
 import { Mail, Plus, Trash2, Pencil, Save, X, PlusCircle, Upload } from 'lucide-react';
 import { Member } from '../types';
 
@@ -23,6 +24,7 @@ export const Members: React.FC = () => {
   const professor = members.find(m => m.role === 'Principal Investigator');
   const phdStudents = members.filter(m => m.role === 'PhD Student');
   const masterStudents = members.filter(m => m.role === 'Master Student');
+  const undergraduateRAs = members.filter(m => m.role === 'Undergraduate Research Assistant');
   const alumni = members.filter(m => m.role === 'Alumni');
 
   // --- Handlers ---
@@ -131,10 +133,11 @@ export const Members: React.FC = () => {
             value={editForm.role} 
             onChange={e => setEditForm({...editForm, role: e.target.value as any})}
           >
-             <option>Principal Investigator</option>
-             <option>PhD Student</option>
-             <option>Master Student</option>
-             <option>Alumni</option>
+             <option value="Principal Investigator">지도 교수</option>
+             <option value="PhD Student">박사 과정</option>
+             <option value="Master Student">석사 과정</option>
+             <option value="Undergraduate Research Assistant">학부 연구생</option>
+             <option value="Alumni">졸업생</option>
           </select>
         </div>
 
@@ -201,13 +204,13 @@ export const Members: React.FC = () => {
     </div>
   );
 
-  const renderStudentGrid = (title: string, students: Member[]) => {
+  const renderStudentGrid = (title: string, titleKo: string, students: Member[]) => {
     if (students.length === 0) return null;
     return (
       <section className="mb-16">
         <div className="flex items-center gap-4 mb-8">
            <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest whitespace-nowrap">
-            {title}
+            {title} <span className="ml-2 text-zinc-300 font-medium normal-case text-[10px]">{titleKo}</span>
           </h2>
           <div className="h-px bg-zinc-100 w-full"></div>
         </div>
@@ -243,7 +246,15 @@ export const Members: React.FC = () => {
                       />
                       <div>
                         <h4 className="text-lg font-bold text-zinc-900 group-hover:text-blue-600 transition-colors">{student.name}</h4>
-                        <p className="text-sm text-zinc-500">{student.role}</p>
+                        <p className="text-sm text-zinc-500">
+                          {student.role === 'PhD Student' ? '박사 과정' : 
+                           student.role === 'Master Student' ? '석사 과정' : 
+                           student.role === 'Undergraduate Research Assistant' ? '학부 연구생' : 
+                           student.role === 'Alumni' ? '졸업생' : student.role}
+                          <span className="text-[10px] text-zinc-300 ml-2">
+                            {student.role}
+                          </span>
+                        </p>
                       </div>
                     </div>
                     
@@ -278,9 +289,11 @@ export const Members: React.FC = () => {
       
       <div className="flex justify-between items-end">
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-zinc-900">People</h1>
+          <h1 className="text-4xl font-bold text-zinc-900 tracking-tight">PEOPLE</h1>
           <p className="text-lg text-zinc-500 max-w-2xl">
-            Meet the team of researchers and students.
+            Meet the team of researchers and students at {LAB_NAME}.
+            <br />
+            <span className="text-sm text-zinc-400">저희 연구실의 교수님과 학생들을 소개합니다.</span>
           </p>
         </div>
         {isAdmin && !isAdding && (
@@ -289,21 +302,22 @@ export const Members: React.FC = () => {
             onClick={() => setIsAdding(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors"
           >
-            <Plus size={18} /> Add Member
+            <Plus size={18} /> 구성원 추가
           </button>
         )}
       </div>
 
       {isAdding && (
         <form onSubmit={handleAddMember} className="p-6 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-4">
-           <h3 className="font-bold text-lg">Add New Member</h3>
+           <h3 className="font-bold text-lg">새 구성원 추가</h3>
            <div className="grid md:grid-cols-2 gap-4">
-             <input required placeholder="Name" className="p-3 border rounded-xl" value={newMember.name || ''} onChange={e => setNewMember({...newMember, name: e.target.value})} />
+             <input required placeholder="이름" className="p-3 border rounded-xl" value={newMember.name || ''} onChange={e => setNewMember({...newMember, name: e.target.value})} />
              <select className="p-3 border rounded-xl" value={newMember.role} onChange={e => setNewMember({...newMember, role: e.target.value as any})}>
-               <option>Principal Investigator</option>
-               <option>PhD Student</option>
-               <option>Master Student</option>
-               <option>Alumni</option>
+              <option value="Principal Investigator">지도 교수</option>
+              <option value="PhD Student">박사 과정</option>
+              <option value="Master Student">석사 과정</option>
+              <option value="Undergraduate Research Assistant">학부 연구생</option>
+              <option value="Alumni">졸업생</option>
              </select>
              <input placeholder="Email" className="p-3 border rounded-xl" value={newMember.email || ''} onChange={e => setNewMember({...newMember, email: e.target.value})} />
              <div className="flex gap-2">
@@ -332,8 +346,8 @@ export const Members: React.FC = () => {
            </div>
 
            <div className="flex gap-3 pt-2">
-              <button type="submit" className="bg-zinc-900 text-white px-6 py-2 rounded-lg">Save Member</button>
-              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-6 py-2 rounded-lg">Cancel</button>
+              <button type="submit" className="bg-zinc-900 text-white px-6 py-2 rounded-lg">저장</button>
+              <button type="button" onClick={() => setIsAdding(false)} className="bg-white border px-6 py-2 rounded-lg">취소</button>
            </div>
         </form>
       )}
@@ -362,7 +376,7 @@ export const Members: React.FC = () => {
                 </div>
               )}
               <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-8 border-b border-zinc-100 pb-2">
-                Principal Investigator
+                Principal Investigator <span className="ml-2 text-zinc-300 font-medium normal-case text-[10px]">지도 교수</span>
               </h2>
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <img 
@@ -372,7 +386,7 @@ export const Members: React.FC = () => {
                 />
                 <div className="space-y-4">
                   <h3 className="text-3xl font-bold text-zinc-900">{professor.name}</h3>
-                  <p className="text-lg text-zinc-600 font-medium">{professor.role}</p>
+                  <p className="text-lg text-zinc-600 font-medium">{professor.role} <span className="text-zinc-400 text-sm ml-2">지도 교수</span></p>
                   
                   <div className="flex flex-wrap gap-2">
                     {professor.researchInterests?.map(interest => (
@@ -398,9 +412,10 @@ export const Members: React.FC = () => {
       )}
 
       {/* Students Grids */}
-      {renderStudentGrid('PhD Candidates', phdStudents)}
-      {renderStudentGrid('Master Students', masterStudents)}
-      {renderStudentGrid('Alumni', alumni)}
+      {renderStudentGrid('PhD Candidates', '박사 과정', phdStudents)}
+      {renderStudentGrid('Master Students', '석사 과정', masterStudents)}
+      {renderStudentGrid('Undergraduate Research Assistants', '학부 연구생', undergraduateRAs)}
+      {renderStudentGrid('Alumni', '졸업생', alumni)}
 
     </div>
   );
