@@ -20,6 +20,7 @@ interface LabContextType {
   isAdmin: boolean;
   login: (password: string) => boolean;
   logout: () => void;
+  changePassword: (newPassword: string) => Promise<void>;
   
   homeImage: string;
   updateHomeImage: (url: string) => void;
@@ -55,6 +56,7 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return localStorage.getItem('lab_is_admin') === 'true';
   });
 
+  const [adminPassword, setAdminPassword] = useState<string>('admin');
   const [homeImage, setHomeImage] = useState<string>('https://picsum.photos/1200/600?grayscale');
   const [news, setNews] = useState<NewsItem[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -67,6 +69,13 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubSettings = onSnapshot(doc(db, "settings", "general"), (doc) => {
       if (doc.exists()) {
         setHomeImage(doc.data().homeImage);
+      }
+    });
+
+    // Admin Password
+    const unsubAuth = onSnapshot(doc(db, "settings", "auth"), (doc) => {
+      if (doc.exists()) {
+        setAdminPassword(doc.data().password);
       }
     });
 
@@ -96,6 +105,7 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     return () => {
       unsubSettings();
+      unsubAuth();
       unsubNews();
       unsubMembers();
       unsubPubs();
@@ -104,7 +114,7 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const login = (password: string) => {
-    if (password === 'admin') {
+    if (password === adminPassword) {
       setIsAdmin(true);
       localStorage.setItem('lab_is_admin', 'true');
       return true;
@@ -115,6 +125,10 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const logout = () => {
     setIsAdmin(false);
     localStorage.removeItem('lab_is_admin');
+  };
+
+  const changePassword = async (newPassword: string) => {
+    await setDoc(doc(db, "settings", "auth"), { password: newPassword }, { merge: true });
   };
 
   // --- Firestore Actions ---
@@ -214,7 +228,7 @@ export const LabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <LabContext.Provider value={{
-      isAdmin, login, logout, resetData,
+      isAdmin, login, logout, changePassword, resetData,
       homeImage, updateHomeImage,
       news, addNews, updateNews, deleteNews,
       members, addMember, updateMember, deleteMember,
